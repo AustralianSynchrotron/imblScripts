@@ -1,12 +1,12 @@
 #!/bin/bash
 
-ZMOTOR="SR08ID01MCS03:MTRC"
+ZMOTOR="SR08ID01MCS04:MTR32H"
 SHUT="SR08ID01IS01"
 LOG="scanthrough.$(date +%Y-%m-%d_%H.%M.%S).log"
 
-YMOTOR=""
-YTRAVEL="1"
-YREPIT="1"
+YMOTOR="SR08ID01MCS04:MTR32E"
+YTRAVEL="19"
+YREPIT="4"
 
 log () {
 	echo $* $(date +%Y-%m-%d_%H:%M:%S) >> $LOG
