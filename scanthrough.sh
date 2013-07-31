@@ -1,8 +1,12 @@
 #!/bin/bash
 
-MOTOR="SR08ID01MCS03:MTRC"
+ZMOTOR="SR08ID01MCS03:MTRC"
 SHUT="SR08ID01IS01"
 LOG="scanthrough.$(date +%Y-%m-%d_%H.%M.%S).log"
+
+YMOTOR=""
+YTRAVEL="1"
+YREPIT="1"
 
 log () {
 	echo $* $(date +%Y-%m-%d_%H:%M:%S) >> $LOG
@@ -10,8 +14,8 @@ log () {
 }
 
 
-if ! caget -t "${MOTOR}" &> /dev/null ; then
-     echo "Error. Motor $MOTOR is not conected."
+if ! caget -t "${ZMOTOR}" &> /dev/null ; then
+     echo "Error. Motor $ZMOTOR is not conected."
      exit 1
 fi
 
@@ -39,38 +43,56 @@ if [ -z "$3" ] ; then
 fi
     
 
-STARTPOSITION=$(caget -t "${MOTOR}.RBV")
-STARTSPEED=$(caget -t "${MOTOR}.VELO")
+ZSTARTPOSITION=$(caget -t "${ZMOTOR}.RBV")
+ZSTARTSPEED=$(caget -t "${ZMOTOR}.VELO")
 
-for (( rep=1 ; rep<=$3 ; rep++ )) ; do
+YSTARTPOSITION=$(caget -t "${YMOTOR}.RBV")
 
-    cawait "${MOTOR}.DMOV" 1
 
-    caput "${MOTOR}.VELO" $2
-    cawait "${MOTOR}.VELO" -w 1
 
-    caput "${SHUT}:SHUTTEROPEN_CMD" 1
-    cawait -n "${SHUT}:SHUTTEROPEN_MONITOR" 1
+for (( yrep=1 ; yrep<=$YREPIT ; yrep++ )) ; do
 
-    log scan $rep beginning
+    cawait "${YMOTOR}.DMOV" 1
 
-    caput "${MOTOR}.RLV" $1
+    for (( rep=1 ; rep<=$3 ; rep++ )) ; do
 
-    # scans here
-    echo -n "Scan $rep ... "
-    cawait "${MOTOR}.DMOV" 1
-    echo "done."
+      cawait "${ZMOTOR}.DMOV" 1
 
-    log scan $rep end
+      caput "${ZMOTOR}.VELO" $2
+      cawait "${ZMOTOR}.VELO" -w 1
 
-    caput "${SHUT}:SHUTTEROPEN_CMD" 0
-    cawait -n "${SHUT}:SHUTTEROPEN_MONITOR" 0
+      caput "${SHUT}:SHUTTEROPEN_CMD" 1
+      cawait -n "${SHUT}:SHUTTEROPEN_MONITOR" 1
 
-    caput "${MOTOR}.VELO" $STARTSPEED
-    cawait "${MOTOR}.VELO" -w 1
+      log scan $yrep $rep beginning
 
-    caput "${MOTOR}" $STARTPOSITION
+      caput "${ZMOTOR}.RLV" $1
 
-    
+      # scans here
+      echo -n "Scan $rep ... "
+      cawait "${ZMOTOR}.DMOV" 1
+      echo "done."
+
+      log scan $yrep $rep end
+
+      caput "${SHUT}:SHUTTEROPEN_CMD" 0
+      cawait -n "${SHUT}:SHUTTEROPEN_MONITOR" 0
+
+      caput "${ZMOTOR}.VELO" $ZSTARTSPEED
+      cawait "${ZMOTOR}.VELO" -w 1
+
+      caput "${ZMOTOR}" $ZSTARTPOSITION
+
+    done
+
+    caput "${YMOTOR}.RLV" $YTRAVEL
+    sleep 0.2s
 
 done
+
+caput "${YMOTOR}.STOP" 1
+cawait "${YMOTOR}.DMOV" 1
+
+caput "${YMOTOR}" $YSTARTPOSITION
+cawait "${YMOTOR}.DMOV" 1
+
