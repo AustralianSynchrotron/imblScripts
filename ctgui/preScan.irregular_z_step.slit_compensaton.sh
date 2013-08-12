@@ -10,7 +10,7 @@ COMPENSATENEGMOTORPV="SR08ID01:MTR31B"
 zcur=0;
 foundz=""
 for tryz in $ZDS ; do 
-  if [ "$zcur" -eq "$CURRENTZ" ] ; then
+  if [ "$zcur" -eq "$CURRENTSCAN" ] ; then
     foundz="$tryz"
   fi
   zcur=$((zcur+1))

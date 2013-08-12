@@ -9,7 +9,6 @@ LOG="scanthrough.$(date +%Y-%m-%d_%H.%M.%S).log"
 
 log () {
 	echo $* $(date +%Y-%m-%d_%H:%M:%S) >> $LOG
-	caget keithley:unit2:Measure keithley:unit4:Measure >> $LOG
 }
 
 
@@ -70,6 +69,8 @@ ZSTARTSPEED=$(caget -t "${ZMOTOR}.VELO")
 
 YSTARTPOSITION=$(caget -t "${YMOTOR}.RBV")
 
+BREAKME=false
+
 
 
 for (( yrep=1 ; yrep<=$YREPIT ; yrep++ )) ; do
@@ -90,8 +91,20 @@ for (( yrep=1 ; yrep<=$YREPIT ; yrep++ )) ; do
 
       caput "${ZMOTOR}.RLV" $ZTRAVEL
 
-      # scans here
+     # scans here
       echo -n "Scan $rep ... "
+
+      sleep 1s
+      if caget -t ${ZMOTOR}.DMOV | grep 1 -q ; then
+         log scan Y$yrep Z$rep FAILED
+	 caput "${SHUT}:SHUTTEROPEN_CMD" 0
+	 caput "${YMOTOR}" $YSTARTPOSITION
+         echo 
+         echo "ERROR HAPPENED: THE Z MOTOR DID NOT START"
+         echo "TERMINATING THE SCRIPT"
+         echo
+      fi
+ 
       cawait "${ZMOTOR}.DMOV" 1
       echo "done."
 
@@ -111,6 +124,9 @@ for (( yrep=1 ; yrep<=$YREPIT ; yrep++ )) ; do
     sleep 0.2s
 
 done
+
+caput "${SHUT}:SHUTTEROPEN_CMD" 0
+
 
 caput "${YMOTOR}.STOP" 1
 cawait "${YMOTOR}.DMOV" 1
