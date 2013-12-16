@@ -28,12 +28,14 @@ cawait "${MOTOR}.DMOV" 1
 
 for (( rep=1 ; rep<=$REPS ; rep++ )) ; do
 
-    caput -t ${MOTOR} $NegativeSoftLimit  > /dev/null
+    #caput -t ${MOTOR} $NegativeSoftLimit
+    caput -t ${MOTOR} -50
     sleep 2s
     cawait "${MOTOR}.DMOV" 1
     echo NEGATIVE $(caget -t ${MOTOR}.RBV)
 
-    caput -t ${MOTOR} $PositiveSoftLimit  > /dev/null
+    #caput -t ${MOTOR} $PositiveSoftLimit 
+    caput -t ${MOTOR} 300 
     sleep 1s
     cawait "${MOTOR}.DMOV" 1
     echo POSITIVE $(caget -t ${MOTOR}.RBV)

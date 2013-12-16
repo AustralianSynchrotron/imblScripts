@@ -21,7 +21,7 @@ if [ -z "$foundz" ] ; then
   exit 1
 fi
 
-if echo $foundz | grep -Evq "^[0-9]*\.?[0-9]*$" ; then
+if echo $foundz | grep -Evq "^[\-0-9]*\.?[0-9]*$" ; then
   echo "Not a float point:" $foundz
   exit 1
 fi
