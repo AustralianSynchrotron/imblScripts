@@ -1,16 +1,10 @@
 #!/bin/bash
 
-USAGE="Usage: $0 <y-step> <y-repetitions> <z-travel> <z-repetitions> <z-speed>"
+USAGE="Usage: $0 <y-step> <y-repetitions> <z-travel> <z-repetitions> <z-speed> [samplename]"
 
 ZMOTOR="SR08ID01MCS04:MTR32H"
 YMOTOR="SR08ID01MCS04:MTR32E"
 SHUT="SR08ID01IS01"
-LOG="scanthrough.$(date +%Y-%m-%d_%H.%M.%S).log"
-
-log () {
-	echo $* $(date +%Y-%m-%d_%H:%M:%S) >> $LOG
-}
-
 
 if ! caget -t "${ZMOTOR}" &> /dev/null ; then
      echo "Error. Motor $ZMOTOR is not conected."
@@ -61,6 +55,18 @@ if [ -z "$5" ] ; then
     exit 1
 fi
 ZSPEED="$5"
+
+LOG=""
+if [ -z "$6" ] ; then
+     LOG="scanthrough"
+else
+     LOG="$6"
+fi
+LOG="${LOG}.$(date +%Y-%m-%d_%H.%M.%S).log"
+
+log () {
+	echo $* $(date +%Y-%m-%d_%H:%M:%S) >> $LOG
+}
 
     
 
