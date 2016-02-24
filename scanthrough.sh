@@ -2,9 +2,10 @@
 
 USAGE="Usage: $0 <y-step> <y-repetitions> <z-travel> <z-repetitions> <z-speed> [samplename]"
 
-ZMOTOR="SR08ID01MCS04:MTR32H"
-YMOTOR="SR08ID01MCS04:MTR32E"
-SHUT="SR08ID01IS01"
+ZMOTOR="SR08ID01SST11:Z"
+YMOTOR="SR08ID01SST11:Y"
+#SHUT="SR08ID01IS01"
+SHUT="SR08ID01MRT01"
 
 if ! caget -t "${ZMOTOR}" &> /dev/null ; then
      echo "Error. Motor $ZMOTOR is not conected."
@@ -74,6 +75,7 @@ ZSTARTPOSITION=$(caget -t "${ZMOTOR}.RBV")
 ZSTARTSPEED=$(caget -t "${ZMOTOR}.VELO")
 
 YSTARTPOSITION=$(caget -t "${YMOTOR}.RBV")
+YVELO=$(caget -t "${YMOTOR}.VELO")
 
 BREAKME=false
 
@@ -111,6 +113,10 @@ for (( yrep=1 ; yrep<=$YREPIT ; yrep++ )) ; do
          echo
       fi
  
+      scantime=$( echo "scale=2 ; sqrt($ZTRAVEL*$ZTRAVEL) / $ZSPEED " | bc )
+      sleep ${scantime}s
+      echo ${scantime}s
+      
       cawait "${ZMOTOR}.DMOV" 1
       echo "done."
 
@@ -121,13 +127,23 @@ for (( yrep=1 ; yrep<=$YREPIT ; yrep++ )) ; do
 
       caput "${ZMOTOR}.VELO" $ZSTARTSPEED
       cawait "${ZMOTOR}.VELO" -w 1
+      
+      sleep 0.25s
 
       caput "${ZMOTOR}" $ZSTARTPOSITION
+       
+      scantime=$( echo "scale=2 ; sqrt($ZTRAVEL*$ZTRAVEL) / $ZSTARTSPEED " | bc )
+      sleep ${scantime}s
+      sleep 1s
 
     done
 
     caput "${YMOTOR}.RLV" $YTRAVEL
-    sleep 0.2s
+
+    #scantime=$( echo "scale=2 ; sqrt($YTRAVEL*$YTRAVEL) / $YVELO " | bc )
+    #echo $scantime
+    #sleep ${scantime}s
+    sleep 2.6s
 
 done
 
