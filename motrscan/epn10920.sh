@@ -2,7 +2,7 @@
 
 if [ -z "${1}" ] ; then
   echo "No travel distance given" 1>&2
-  echo "$USAGE" 1>&2
+  echo "0" 
   exit 1
 fi
 
@@ -58,6 +58,8 @@ while read pv state ; do
     killall camonitor
   fi
 done
+
+echo 1
 
 exit 0
 
