@@ -24,7 +24,7 @@ CURRD="$(caget -t $CURPV)"
 echo "# Starting new acquisition: $(date) " >> $LOGFILE
 
 
-caput "${MOTIONMOTOR}.RLV" "$MOTIONDISTANCE"
+caput "${MOTIONMOTOR}.RLV" "$MOTIONDISTANCE" > /dev/null
 sleep .5s
 
 camonitor -p 99 -n -S "${MOTIONMOTOR}.RBV" "${MOTIONMOTOR}.DMOV" $LOGPVS | sed -u "s/  \+/ /g" |
@@ -32,9 +32,9 @@ while read pv date time val ; do
 
   case "$pv" in
     ${MOTIONMOTOR}.DMOV ) 
-      if [ "$val" != "1" ] ; then
+      if [ "$val" == "1" ] ; then
          echo "# Finishing acquisition: $(date)" >> $LOGFILE
-         break;
+         killall camonitor
       fi
       ;;
     ${MOTIONMOTOR}.RBV )
@@ -49,11 +49,15 @@ while read pv date time val ; do
 
 done
 
-killall camonitor
 
-caput "${MOTIONMOTOR}" "$MOTIONSTAR"
+caput "${MOTIONMOTOR}" "$MOTIONSTART" > /dev/null
 sleep .5s
-cawait ${MOTIONMOTOR}.DMOV 1
+camonitor -t n "${MOTIONMOTOR}.DMOV" | sed -u "s/  \+/ /g" | 
+while read pv state ; do
+  if [ "$state" == "1" ] ; then
+    killall camonitor
+  fi
+done
 
 exit 0
 
