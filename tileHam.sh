@@ -9,7 +9,7 @@ IMAGEMODE=$(caget -t $DETPV:CAM:ImageMode)
 IMAGENAME=$(caget -t -S $DETPV:TIFF:FileName)
 STARTPOS=$(caget -t $MOT.RBV)
 
-caput $DETPV:CAM:ImageMode Single
+#caput $DETPV:CAM:ImageMode Single
 
 NMTEMPL=$1
 if [ -z "$1" ] ; then
@@ -25,14 +25,14 @@ moveMotor() {
 
 shot() {
 
-	caput -t $DETPV:CAM:Acquire 0 > /dev/null
-	cawait $DETPV:CAM:Acquire_RBV Done
+	#caput -t $DETPV:CAM:Acquire 0 > /dev/null
+	#cawait $DETPV:CAM:Acquire_RBV Done
 
-	caput -t $DETPV:CAM:Acquire 1 > /dev/null
+	#caput -t $DETPV:CAM:Acquire 1 > /dev/null
 	sleep 1s
-	cawait $DETPV:CAM:Acquire_RBV Done
+	#cawait $DETPV:CAM:Acquire_RBV Done
 
-        caput -S $DETPV::TIFF:FileName "$1"
+        caput -S $DETPV:TIFF:FileName "$1" > /dev/null
 
 	caput -t $DETPV:TIFF:WriteFile 1 > /dev/null
 	cawait $DETPV:TIFF:WriteFile_RBV Done
@@ -44,13 +44,13 @@ shot() {
 
 
 moveMotor $MOT 310
-LISTIMG=$( basename $(shot NMTEMPL_1_) )
+LISTIMG=$( basename $(shot ${NMTEMPL}_1_) )
 
 moveMotor $MOT 490
-LISTIMG="${LISTIMG} $( basename $(shot NMTEMPL_2_) )"
+LISTIMG="${LISTIMG} $( basename $(shot ${NMTEMPL}_2_) )"
  
 moveMotor $MOT 670
-LISTIMG="${LISTIMG} $( basename $(shot NMTEMPL_3_) )"
+LISTIMG="${LISTIMG} $( basename $(shot ${NMTEMPL}_3_) )"
 
 caput $DETPV:CAM:ImageMode $IMAGEMODE
 
