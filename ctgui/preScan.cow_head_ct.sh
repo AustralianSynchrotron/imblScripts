@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LOG="/home/imbl/work/projects/scripts/ctgui/test.log"
+LOG="/home/ics/Work/scripts/ctgui/test.log"
 
 if [ -z "$1" ] ; then
   echo "Error. No Y start given." >> $LOG
@@ -32,8 +32,8 @@ if [ -z "$5" ] ; then
 fi
 VSTEP=$5
 
-MOTORH="SR08ID01ROB01:MOTOR_Y"
-MOTORV="SR08ID01ROB01:MOTOR_Z"
+MOTORH="SR08ID01ROB01:MOTOR_Z"
+MOTORV="SR08ID01ROB01:MOTOR_Y"
 
 HCUR=$(( $CURRENTSCAN % $HSCANS  ))
 VCUR=$(( $CURRENTSCAN / $HSCANS  ))
