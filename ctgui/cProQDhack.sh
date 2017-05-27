@@ -5,6 +5,8 @@ if [ -z "$1" ] ; then
   exit 1
 fi
 
+caput ${DETECTORPV}:CAM:AcquirePeriod 0
+
 GOAL=$(caget -t ${ROTATIONMOTORPV}.VAL)
 caput ${ROTATIONMOTORPV}.STOP 1
 cawait ${ROTATIONMOTORPV}.DMOV 1
