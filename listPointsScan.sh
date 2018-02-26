@@ -6,8 +6,14 @@ if [ -z "$1" ] ; then
 fi
 LISTFILE="$1"
 
-MOTORXPV="SR08ID01SST02:Y"
-MOTORYPV="SR08ID01SST02:Z"
+if [ ! -e "$LISTFILE" ] ; then
+  echo Input file \"$LISTFILE\" does not exist
+  exit 1
+fi
+
+
+MOTORXPV="SR08ID01SST11:Y"
+MOTORYPV="SR08ID01SST11:Z"
 DETPV="SR08ID01DET02"
 
 moveMotor() {
@@ -33,11 +39,18 @@ shot() {
 }
 
 
+
+caput SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_CMD 1
+sleep 3s
+
 cat $LISTFILE |
 while read xpos ypos ; do
   echo X $xpos Y $ypos
   moveMotor $MOTORXPV $xpos
   moveMotor $MOTORYPV $ypos
-  sleep 0.1s
+  #sleep 0.1s
   shot "$(basename $LISTFILE)_X${xpos}_Y${ypos}"
 done
+
+caput SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_CMD 1
+sleep 3s
