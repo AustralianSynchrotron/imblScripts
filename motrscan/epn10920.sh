@@ -1,17 +1,28 @@
 #!/bin/bash
 
 if [ -z "${1}" ] ; then
-  echo "No travel distance given" 1>&2
+  echo "No log name" 1>&2
   echo "0" 
   exit 1
 fi
 
-LOGFILE="log.dat"
-MOTIONMOTOR="SR08ID01DST31:Y"
-MOTIONDISTANCE="$1"
-MOTIONSTART="$(caget -t ${MOTIONMOTOR}.RBV)"
 
-IC1PV="SR08ID01DAQ03:Measure"
+LOGPATH="/mnt/m.imbl/input"
+LOGFILE="$LOGPATH/$1"
+MOTIONMOTOR="SR08ID01DST21:Y"
+MOTIONDISTANCE="870"
+MOTIONSTART="-10"
+
+caput "${MOTIONMOTOR}" "$MOTIONSTART" > /dev/null
+sleep .5s
+camonitor -t n "${MOTIONMOTOR}.DMOV" | sed -u "s/  \+/ /g" | 
+while read pv state ; do
+  if [ "$state" == "1" ] ; then
+    killall camonitor
+  fi
+done
+
+IC1PV="SR08ID01DAQ05:Measure"
 IC2PV="SR08ID01DAQ04:Measure"
 CURPV="SR11BCM01:CURRENT_MONITOR"
 
@@ -21,7 +32,7 @@ IC2RD="$(caget -t $IC2PV)"
 CURRD="$(caget -t $CURPV)"
 
 
-echo "# Starting new acquisition: $(date) " >> $LOGFILE
+echo "# Starting new acquisition at Z $(caget -t SR08ID01TBL24:Z.RBV): $(date) " >> $LOGFILE
 
 
 caput "${MOTIONMOTOR}.RLV" "$MOTIONDISTANCE" > /dev/null
@@ -39,7 +50,8 @@ while read pv date time val ; do
       ;;
     ${MOTIONMOTOR}.RBV )
       POS="$val"
-      echo "${date}_${time}" $IC1RD $IC2RD $CURRD >> $LOGFILE
+      #echo "${date}_${time}" $POS $IC1RD $IC2RD $CURRD >> $LOGFILE
+      echo "${date}_${time}" $POS $(caget -t $IC1PV $IC2PV $CURPV) >> $LOGFILE
       ;;
     $IC1PV )  IC1RD="$val" ;;
     $IC2PV )  IC2RD="$val" ;;
@@ -51,13 +63,6 @@ done
 
 
 caput "${MOTIONMOTOR}" "$MOTIONSTART" > /dev/null
-sleep .5s
-camonitor -t n "${MOTIONMOTOR}.DMOV" | sed -u "s/  \+/ /g" | 
-while read pv state ; do
-  if [ "$state" == "1" ] ; then
-    killall camonitor
-  fi
-done
 
 echo 1
 

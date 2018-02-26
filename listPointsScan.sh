@@ -1,16 +1,14 @@
 #!/bin/bash
 
 if [ -z "$1" ] ; then
-  echo "Error. No image base name given."
+  echo "Error. No input list given"
   exit 1
 fi
-IMAGEBASENAME="$1"
+LISTFILE="$1"
 
-LISTFILE="XYpositions.txt"
-
-MOTORXPV=""
-MOTORYPV=""
-DETPV=""
+MOTORXPV="SR08ID01SST02:Y"
+MOTORYPV="SR08ID01SST02:Z"
+DETPV="SR08ID01DET02"
 
 moveMotor() {
   caput $1 $2
@@ -40,5 +38,5 @@ while read xpos ypos ; do
   echo X $xpos Y $ypos
   moveMotor $MOTORXPV $xpos
   moveMotor $MOTORYPV $ypos
-  echo shot $IMAGEBASENAME.X$xpos.Y$ypos
+  shot "$(basename $LISTFILE)_X${xpos}_Y${ypos}"
 done
