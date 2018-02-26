@@ -38,5 +38,6 @@ while read xpos ypos ; do
   echo X $xpos Y $ypos
   moveMotor $MOTORXPV $xpos
   moveMotor $MOTORYPV $ypos
+  sleep 0.1s
   shot "$(basename $LISTFILE)_X${xpos}_Y${ypos}"
 done
