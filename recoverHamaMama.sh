@@ -1,0 +1,23 @@
+#! /bin/bash
+
+caput SR08ID01DETIOC08:CAM:AcquireTime 0.059
+caput -S SR08ID01DETIOC08:TIFF:FileName "test"
+caput -S SR08ID01DETIOC08:TIFF:FilePath "e:/imbl/input/test"
+caput -S SR08ID01DETIOC08:TIFF:FileTemplate "%s%s_%04d.tif"
+caput SR08ID01DETIOC08:TIFF:EnableCallbacks 1
+caput SR08ID01DETIOC08:HDF:EnableCallbacks 1
+
+caput -S SR08ID01DETIOC08:TIFF:NDArrayPort "ROI1"
+caput SR08ID01DETIOC08:ROI1:MinX 0
+caput SR08ID01DETIOC08:ROI1:MinY 470
+caput SR08ID01DETIOC08:ROI1:SizeX 1216
+caput SR08ID01DETIOC08:ROI1:SizeY 270
+
+
+
+caput SR08ID01DETIOC08:ROI1:EnableCallbacks 1
+caput SR08ID01DETIOC08:IMAGE:EnableCallbacks 1
+caput SR08ID01DETIOC08:STATS:EnableCallbacks 1
+caput SR08ID01DETIOC08:ROI1:IMAGE:EnableCallbacks 1
+caput SR08ID01DETIOC08:ROI1:STATS:EnableCallbacks 1
+
