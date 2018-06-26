@@ -1,5 +1,7 @@
 #! /bin/bash
 
+caput SR08ID01DETIOC08:CAM:ImageMode Multiple
+
 caput SR08ID01DETIOC08:CAM:AcquireTime 0.059
 caput -S SR08ID01DETIOC08:TIFF:FileName "test"
 caput -S SR08ID01DETIOC08:TIFF:FilePath "e:/imbl/input/test"
@@ -20,4 +22,11 @@ caput SR08ID01DETIOC08:IMAGE:EnableCallbacks 1
 caput SR08ID01DETIOC08:STATS:EnableCallbacks 1
 caput SR08ID01DETIOC08:ROI1:IMAGE:EnableCallbacks 1
 caput SR08ID01DETIOC08:ROI1:STATS:EnableCallbacks 1
+
+sleep 1s
+caput SR08ID01DETIOC08:CAM:Acquire 1
+sleep 2s
+caput SR08ID01DETIOC08:CAM:Acquire 0
+
+caput SR08ID01DETIOC08:HDF:EnableCallbacks 0
 
